@@ -1,0 +1,6 @@
+[submodule "external/qcustomplot"]
+	path = external/qcustomplot
+	url = https://github.com/conelov/qcustomplot-fetch.git
+[submodule "external/range-v3"]
+	path = external/range-v3
+	url = https://github.com/ericniebler/range-v3.git
