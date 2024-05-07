@@ -6,7 +6,7 @@
 
 #include <variant>
 
-#include <QMap>
+#include <QVector>
 
 
 namespace ssq {
@@ -18,24 +18,30 @@ struct RunnerMessage final {
 
 
   struct DataCargo {
-    using Data = QMap<double, double>;
+    using Data = QVector<QPair<double, double>>;
     Data data;
+
+    explicit DataCargo(auto&& data)
+        : data{std::forward<decltype(data)>(data)} {
+    }
   };
 
 
   struct Running final : public DataCargo {
+    using DataCargo::DataCargo;
   };
 
 
   struct Hold final : public DataCargo {
+    using DataCargo::DataCargo;
   };
 };
 
 
 using RunnerMessageVariant = std::variant<
-  RunnerMessage::Initial,
-  RunnerMessage::Running,
-  RunnerMessage::Hold>;
+  RunnerMessage::Initial const,
+  RunnerMessage::Running const,
+  RunnerMessage::Hold const>;
 
 
 }// namespace ssq

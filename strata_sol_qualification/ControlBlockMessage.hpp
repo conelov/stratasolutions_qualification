@@ -14,7 +14,7 @@ namespace ssq {
 struct ControlBlockMessage final {
   Q_GADGET
 public:
-  enum RunMode {
+  enum RunMode : std::uint8_t {
     Uniform,
   };
   Q_ENUM(RunMode)
@@ -35,9 +35,9 @@ public:
 
 
 using ControlBlockMessageVariant = std::variant<
-  ControlBlockMessage::Run,
-  ControlBlockMessage::Stop,
-  ControlBlockMessage::Pause>;
+  ControlBlockMessage::Run const,
+  ControlBlockMessage::Stop const,
+  ControlBlockMessage::Pause const>;
 
 
 }// namespace ssq

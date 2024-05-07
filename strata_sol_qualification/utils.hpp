@@ -18,6 +18,13 @@
 namespace ssq {
 
 
+// https://en.cppreference.com/w/cpp/utility/variant/visit
+template<class... Ts>
+struct overloaded : Ts... {
+  using Ts::operator()...;
+};
+
+
 template<bool Cond_, typename Then, typename Else>
 [[nodiscard]] inline constexpr decltype(auto) eval_if(Then&& then_, Else&& else_) {
   if constexpr (Cond_) {

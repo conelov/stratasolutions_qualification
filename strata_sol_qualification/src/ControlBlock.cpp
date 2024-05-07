@@ -36,7 +36,7 @@ ControlBlock::ControlBlock(QWidget* parent)
     hana::make_tuple(
       hana::pair{p->pb_start, [this] {
                    return ControlBlockMessage::Run{
-                     .mode = static_cast<ControlBlockMessage::RunMode>(p->cb_mode->currentIndex()),
+                     static_cast<ControlBlockMessage::RunMode>(p->cb_mode->currentIndex()),
                    };
                  }},
       hana::pair{p->pb_pause, [] {
@@ -48,14 +48,10 @@ ControlBlock::ControlBlock(QWidget* parent)
     [this](auto&& pair) {
       hana::unpack(std::forward<decltype(pair)>(pair), [this](auto pb, auto msg_getter) {
         QObject::connect(pb, &QPushButton::released, this, [this, msg_getter] {
-          emit kick(std::make_shared<ControlBlockMessageVariant>(msg_getter()), {});
+          emit kick(msg_getter(), {});
         });
       });
     });
-}
-
-
-void ControlBlock::changes(std::shared_ptr<RunnerMessageVariant>) {
 }
 
 

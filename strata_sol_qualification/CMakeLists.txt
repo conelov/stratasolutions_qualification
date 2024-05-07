@@ -3,6 +3,7 @@ set(name ${PROJECT_NAME})
 
 add_executable(${name}
   main.cpp
+  Application.hpp
   MainWindow.hpp src/MainWindow.cpp
   ControlBlock.hpp src/ControlBlock.cpp
   Runner.hpp src/Runner.cpp

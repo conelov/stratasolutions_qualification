@@ -16,10 +16,10 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
     <item>
-     <widget class="QCustomPlot" name="widget_2" native="true"/>
+     <widget class="QCustomPlot" name="plot" native="true"/>
     </item>
     <item>
-     <widget class="ssq::ControlBlock" name="frame">
+     <widget class="ssq::ControlBlock" name="controlBlock">
       <property name="frameShape">
        <enum>QFrame::Box</enum>
       </property>

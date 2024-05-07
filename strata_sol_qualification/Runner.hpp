@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include <QObject>
 #include <QScopedPointer>
 
@@ -26,10 +24,10 @@ public:
   Runner(QObject* parent = nullptr);
 
 public slots:
-  void changes(std::shared_ptr<ControlBlockMessageVariant> control);
+  void changes(ControlBlockMessageVariant control);
 
 signals:
-  void kick(std::shared_ptr<RunnerMessageVariant>, QPrivateSignal) const;
+  void kick(RunnerMessageVariant, QPrivateSignal) const;
 
 private:
   struct Private;

@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include <QFrame>
 
 #include <strata_sol_qualification/ControlBlockMessage.hpp>
@@ -22,10 +20,10 @@ public:
   ControlBlock(QWidget* parent = nullptr);
 
 public slots:
-  void changes(std::shared_ptr<RunnerMessageVariant>);
+//  void changes(RunnerMessageVariant);
 
 signals:
-  void kick(std::shared_ptr<ControlBlockMessageVariant>, QPrivateSignal) const;
+  void kick(ControlBlockMessageVariant, QPrivateSignal) const;
 
 private:
   struct Private;
