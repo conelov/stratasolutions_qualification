@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <QPointer>
+
 #include <qcustomplot.h>
 
 #include <strata_sol_qualification/RunnerMessage.hpp>
@@ -24,7 +26,7 @@ public slots:
   void changes(RunnerMessageVariant msg);
 
 private:
-  QCPGraph* graph_ = nullptr;
+  QPointer<QCPGraph> graph_;
 };
 
 

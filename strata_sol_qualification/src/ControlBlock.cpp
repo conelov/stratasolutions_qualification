@@ -6,6 +6,7 @@
 
 #include <boost/hana/for_each.hpp>
 #include <boost/hana/tuple.hpp>
+#include <boost/hana/unpack.hpp>
 
 #include <strata_sol_qualification/utils.hpp>
 
@@ -13,6 +14,18 @@
 
 
 namespace ssq {
+
+
+void widget_enable_toggle(bool mode, auto*... pbs) {
+  for (auto const pb : {pbs...}) {
+    pb->setEnabled(mode);
+  }
+}
+
+
+void widget_enable_toggle(auto*... pbs) {
+  widget_enable_toggle(true, pbs...);
+}
 
 
 struct ControlBlock::Private final : public Ui::ControlBlock {
@@ -61,16 +74,17 @@ ControlBlock::ControlBlock(QWidget* parent)
 void ControlBlock::changes(RunnerMessageVariant msg) {
   std::visit(
     overloaded{
-      [this](RunnerMessage::DataCargo const& msg) {
-
+      [this](RunnerMessage::Running const&) {
+        widget_enable_toggle(p->pb_pause, p->pb_stop);
       },
 
-      [](RunnerMessage::Initial const& msg) {
-
+      [this](RunnerMessage::Initial const&) {
+        widget_enable_toggle(p->pb_start);
       },
 
-      //      [this](RunnerMessage::Hold const& msg) {
-      //      },
+      [this](RunnerMessage::Hold const&) {
+        widget_enable_toggle(p->pb_start, p->pb_stop);
+      },
     },
     msg);
 }

@@ -25,7 +25,7 @@ void Plot::changes(RunnerMessageVariant msg) {
         if (!graph_) {
           graph_ = addGraph();
           graph_->setLineStyle(QCPGraph::lsNone);
-          graph_->setScatterStyle(QCPScatterStyle{QCPScatterStyle::ssCircle, 5});
+          graph_->setScatterStyle(QCPScatterStyle{QCPScatterStyle::ssCircle, 2});
         }
         for (auto const [x, y] : msg.data) {
           graph_->addData(x, y);
@@ -34,8 +34,11 @@ void Plot::changes(RunnerMessageVariant msg) {
         replot();
       },
 
-      [](RunnerMessage::Initial const& msg) {
-
+      [this](RunnerMessage::Initial const& msg) {
+        if (graph_) {
+          removeGraph(graph_);
+          replot();
+        }
       },
     },
     msg);

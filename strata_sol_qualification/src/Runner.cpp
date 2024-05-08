@@ -6,12 +6,14 @@
 
 #include <functional>
 
+#include <boost/preprocessor/stringize.hpp>
+
 #include <QBasicTimer>
 #include <QPointer>
 #include <QThread>
 #include <QTimerEvent>
 
-#include <range/v3/all.hpp>
+#include <range/v3/view/generate_n.hpp>
 
 #include <strata_sol_qualification/Application.hpp>
 #include <strata_sol_qualification/utils.hpp>
@@ -25,7 +27,7 @@ namespace _ {
 struct Range final {
   int min;
   int max;
-} constexpr gen_range{0, 100};
+} constexpr gen_range{-1000, 1000};
 
 
 class Worker final : public QObject {
@@ -36,7 +38,7 @@ public:
   }
 
 
-  Q_INVOKABLE void generate(ControlBlockMessage::Run msg, int interval = 250) {
+  Q_INVOKABLE void generate(ControlBlockMessage::Run msg, int interval = 150) {
     if (std::exchange(config_.mode, msg.mode) != msg.mode || !generator_) {
       switch (config_.mode) {
         case ControlBlockMessage::RunMode::Uniform:
@@ -52,11 +54,21 @@ public:
     updater.start(interval, this);
   }
 
-public slots:
-  void stop() {
+
+  Q_INVOKABLE void pause() {
     updater.stop();
-    data_.clear();
     generator_ = nullptr;
+  }
+
+
+  Q_INVOKABLE RunnerMessage::DataCargo::Data data() const {
+    return data_;
+  }
+
+private:
+  void stop() {
+    pause();
+    data_.clear();
   }
 
 signals:
@@ -95,7 +107,7 @@ private:
 class ThreadOwner final {
 public:
   ~ThreadOwner() {
-    if (running()) {
+    if (is_running()) {
       stop();
     }
   }
@@ -107,7 +119,7 @@ public:
 
 
   void start() {
-    assert(!running());
+    assert(!is_running());
     th_ = new QThread{&parent_};
     w_  = new Worker;
     w_->moveToThread(th_);
@@ -116,7 +128,7 @@ public:
 
 
   void stop() {
-    assert(running());
+    assert(is_running());
     w_->deleteLater();
     th_->quit();
     th_->wait();
@@ -125,12 +137,12 @@ public:
 
 
   Worker& worker() {
-    assert(running());
+    assert(is_running());
     return *w_;
   }
 
 
-  bool running() const {
+  bool is_running() const {
     assert(!th_ == !w_);
     return th_;
   }
@@ -176,12 +188,17 @@ void Runner::changes(ControlBlockMessageVariant control) {
         });
       },
 
-      [](ControlBlockMessage::Pause const& msg) {
-
+      [this](ControlBlockMessage::Pause const& msg) {
+        auto& worker = p->th.worker();
+        QMetaObject::invokeMethod(&worker, std::bind_front(&_::Worker::pause, &worker));
+        RunnerMessage::DataCargo::Data data;
+        QMetaObject::invokeMethod(&worker, [&data, &worker] { data = worker.data(); }, Qt::BlockingQueuedConnection);
+        emit kick(RunnerMessage::Hold{std::move(data)}, {});
       },
 
       [this](ControlBlockMessage::Stop const& msg) {
         p->th.stop();
+        emit kick(RunnerMessage::Initial{}, {});
       },
     },
     control);
