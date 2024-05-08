@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
     <item>
-     <widget class="QCustomPlot" name="plot" native="true"/>
+     <widget class="ssq::Plot" name="plot" native="true"/>
     </item>
     <item>
      <widget class="ssq::ControlBlock" name="controlBlock">
@@ -33,9 +33,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QCustomPlot</class>
+   <class>ssq::Plot</class>
    <extends>QWidget</extends>
-   <header location="global">qcustomplot.h</header>
+   <header location="global">strata_sol_qualification/Plot.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>

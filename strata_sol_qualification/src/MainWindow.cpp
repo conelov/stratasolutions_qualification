@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget* parent)
   setWindowTitle(QString{PROJECT_NAME} + " v" + PROJECT_VERSION);
 
   QObject::connect(p->controlBlock, &ControlBlock::kick, p->runner, &Runner::changes);
+  QObject::connect(p->runner, &Runner::kick, p->plot, &Plot::changes);
 }
 
 

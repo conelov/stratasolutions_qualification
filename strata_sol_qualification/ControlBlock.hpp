@@ -20,7 +20,7 @@ public:
   ControlBlock(QWidget* parent = nullptr);
 
 public slots:
-//  void changes(RunnerMessageVariant);
+  void changes(RunnerMessageVariant msg);
 
 signals:
   void kick(ControlBlockMessageVariant, QPrivateSignal) const;

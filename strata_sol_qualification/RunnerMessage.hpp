@@ -5,6 +5,7 @@
 #pragma once
 
 #include <variant>
+#include <utility>
 
 #include <QVector>
 
@@ -18,7 +19,7 @@ struct RunnerMessage final {
 
 
   struct DataCargo {
-    using Data = QVector<QPair<double, double>>;
+    using Data = QVector<std::pair<double, double>>;
     Data data;
 
     explicit DataCargo(auto&& data)

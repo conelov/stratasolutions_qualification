@@ -48,10 +48,31 @@ ControlBlock::ControlBlock(QWidget* parent)
     [this](auto&& pair) {
       hana::unpack(std::forward<decltype(pair)>(pair), [this](auto pb, auto msg_getter) {
         QObject::connect(pb, &QPushButton::released, this, [this, msg_getter] {
+          for (auto const pb : findChildren<QPushButton*>()) {
+            pb->setEnabled(false);
+          }
           emit kick(msg_getter(), {});
         });
       });
     });
+}
+
+
+void ControlBlock::changes(RunnerMessageVariant msg) {
+  std::visit(
+    overloaded{
+      [this](RunnerMessage::DataCargo const& msg) {
+
+      },
+
+      [](RunnerMessage::Initial const& msg) {
+
+      },
+
+      //      [this](RunnerMessage::Hold const& msg) {
+      //      },
+    },
+    msg);
 }
 
 

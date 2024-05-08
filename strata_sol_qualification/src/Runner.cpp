@@ -22,6 +22,12 @@ namespace {
 namespace _ {
 
 
+struct Range final {
+  int min;
+  int max;
+} constexpr gen_range{0, 100};
+
+
 class Worker final : public QObject {
   Q_OBJECT
 public:
@@ -30,11 +36,11 @@ public:
   }
 
 
-  Q_INVOKABLE void generate(ControlBlockMessage::Run msg, int interval = 100) {
+  Q_INVOKABLE void generate(ControlBlockMessage::Run msg, int interval = 250) {
     if (std::exchange(config_.mode, msg.mode) != msg.mode || !generator_) {
       switch (config_.mode) {
         case ControlBlockMessage::RunMode::Uniform:
-          generator_ = [dist = std::uniform_int_distribution{0, 100}]() mutable -> double {
+          generator_ = [dist = std::uniform_int_distribution{gen_range.min, gen_range.max}]() mutable -> double {
             return dist(Application::randSource());
           };
           break;
@@ -67,10 +73,10 @@ protected:
 
 private:
   void generate_impl() {
-    constexpr std::size_t samples = 100;
+    constexpr std::size_t samples = 2;
     namespace rv                  = ranges::views;
     for (auto const pair : rv::generate_n([this] {
-           return QPair{generator_(), generator_()};
+           return std::pair{generator_(), generator_()};
          },
            samples)) {
       data_.push_back(pair);
@@ -103,7 +109,7 @@ public:
   void start() {
     assert(!running());
     th_ = new QThread{&parent_};
-    w_ = new Worker;
+    w_  = new Worker;
     w_->moveToThread(th_);
     th_->start();
   }
