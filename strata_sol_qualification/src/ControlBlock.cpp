@@ -17,9 +17,7 @@ namespace ssq {
 
 
 void widget_enable_toggle(bool mode, auto*... pbs) {
-  for (auto const pb : {pbs...}) {
-    pb->setEnabled(mode);
-  }
+  (pbs->setEnabled(mode), ...);
 }
 
 
@@ -64,6 +62,7 @@ ControlBlock::ControlBlock(QWidget* parent)
           for (auto const pb : findChildren<QPushButton*>()) {
             pb->setEnabled(false);
           }
+          p->cb_mode->setEnabled(false);
           emit kick(msg_getter(), {});
         });
       });
@@ -79,11 +78,11 @@ void ControlBlock::changes(RunnerMessageVariant msg) {
       },
 
       [this](RunnerMessage::Initial const&) {
-        widget_enable_toggle(p->pb_start);
+        widget_enable_toggle(p->pb_start, p->cb_mode);
       },
 
       [this](RunnerMessage::Hold const&) {
-        widget_enable_toggle(p->pb_start, p->pb_stop);
+        widget_enable_toggle(p->pb_start, p->pb_stop, p->cb_mode);
       },
     },
     msg);

@@ -16,6 +16,7 @@ struct ControlBlockMessage final {
 public:
   enum RunMode : std::uint8_t {
     Uniform,
+    Normal,
   };
   Q_ENUM(RunMode)
 

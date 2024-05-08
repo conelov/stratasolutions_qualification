@@ -38,12 +38,17 @@ public:
   }
 
 
-  Q_INVOKABLE void generate(ControlBlockMessage::Run msg, int interval = 150) {
+  Q_INVOKABLE void generate(ControlBlockMessage::Run msg, int interval = 25) {
     if (std::exchange(config_.mode, msg.mode) != msg.mode || !generator_) {
       switch (config_.mode) {
         case ControlBlockMessage::RunMode::Uniform:
           generator_ = [dist = std::uniform_int_distribution{gen_range.min, gen_range.max}]() mutable -> double {
             return dist(Application::randSource());
+          };
+          break;
+        case ControlBlockMessage::RunMode::Normal:
+          generator_ = [dist = std::normal_distribution{}]() mutable -> double {
+            return map(dist(Application::randSource()), -5, 5, gen_range.min, gen_range.max);
           };
           break;
         default:
@@ -178,11 +183,15 @@ void Runner::changes(ControlBlockMessageVariant control) {
   std::visit(
     overloaded{
       [this](ControlBlockMessage::Run const& msg) {
-        p->th.start();
+        if (!p->th.is_running()) {
+          p->th.start();
+          auto& worker = p->th.worker();
+          QObject::connect(&worker, &_::Worker::dataStep, this, [this](RunnerMessage::DataCargo::Data data) {
+            emit kick(RunnerMessage::Running{std::move(data)}, {});
+          });
+        }
+
         auto& worker = p->th.worker();
-        QObject::connect(&worker, &_::Worker::dataStep, this, [this](RunnerMessage::DataCargo::Data data) {
-          emit kick(RunnerMessage::Running{std::move(data)}, {});
-        });
         QMetaObject::invokeMethod(&worker, [&worker, msg] {
           worker.generate(msg);
         });

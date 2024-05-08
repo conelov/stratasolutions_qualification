@@ -18,6 +18,11 @@
 namespace ssq {
 
 
+auto map(auto x, auto in_min, auto in_max, auto out_min, auto out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+
 // https://en.cppreference.com/w/cpp/utility/variant/visit
 template<class... Ts>
 struct overloaded : Ts... {
